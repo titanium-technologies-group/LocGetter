@@ -7,7 +7,6 @@ import android.content.pm.PackageManager;
 import android.location.Location;
 import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
-import android.util.Log;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
@@ -34,19 +33,21 @@ import static com.titanium.locgetter.main.Constants.THROWABLE_KEY_LOCATION;
 
 class LocationGetterImpl implements LocationGetter {
 
+    private static final String TAG = "LocationGetter";
+    private Logger logger;
     private GoogleApiClient googleApiClient;
     private LocationRequest locationRequest;
     private Context appContext;
-    private static final String TAG = "LocationGetter";
     private Location latestLoc;
 
     /**
-     *
-     * @param ctx application context to prevent leaks
-     * @param request location request to define
+     * @param logger          for custom logging
+     * @param ctx             application context to prevent leaks
+     * @param request         location request to define
      * @param googleApiClient needed for turning on locations api
      */
-    LocationGetterImpl(Context ctx, LocationRequest request, GoogleApiClient googleApiClient) {
+    LocationGetterImpl(Logger logger, Context ctx, LocationRequest request, GoogleApiClient googleApiClient) {
+        this.logger = logger;
         this.googleApiClient = googleApiClient;
         appContext = ctx;
         locationRequest = request;
@@ -82,25 +83,25 @@ class LocationGetterImpl implements LocationGetter {
                 throw new RuntimeException(THROWABLE_KEY_LOCATION);
             }
         }
-        Log.i(TAG, "Google api client connected");
+        logger.log(TAG, "Google api client connected");
     }
 
     private Status getLocationSettingsStatus(GoogleApiClient googleApiClient) {
         LocationSettingsRequest.Builder builder = new LocationSettingsRequest.Builder();
         builder.setAlwaysShow(true);
         builder.addLocationRequest(locationRequest);
-        PendingResult<LocationSettingsResult> result = LocationServices.SettingsApi.checkLocationSettings(this.googleApiClient, builder.build());
+        PendingResult<LocationSettingsResult> result = LocationServices.SettingsApi.checkLocationSettings(googleApiClient, builder.build());
         return result.await().getStatus();
     }
 
     private void checkSettingsStatus(Status status) {
-        Log.i(TAG, "checkSettingsStatus -> settings status = " + status);
+        logger.log(TAG, "checkSettingsStatus -> settings status = " + status);
         switch (status.getStatusCode()) {
             case LocationSettingsStatusCodes.SUCCESS:
-                Log.i(TAG, "checkSettingsStatus:Location is enabled");
+                logger.log(TAG, "checkSettingsStatus:Location is enabled");
                 break;
             case LocationSettingsStatusCodes.RESOLUTION_REQUIRED:
-                Log.i(TAG, "checkSettingsStatus:Location settings are not satisfied. Show the user a dialog to upgrade location settings ");
+                logger.log(TAG, "checkSettingsStatus:Location settings are not satisfied. Show the user a dialog to upgrade location settings ");
             case LocationSettingsStatusCodes.SETTINGS_CHANGE_UNAVAILABLE:
                 throw new LocationSettingsException(status);
         }
@@ -130,7 +131,7 @@ class LocationGetterImpl implements LocationGetter {
                     if (e.isDisposed())
                         unSubscribeFromUpdates();
                     else {
-                        Log.i(TAG, "Got new location :" + location);
+                        logger.log(TAG, "Got new location :" + location);
                         latestLoc = location;
                         e.onNext(location);
                     }
