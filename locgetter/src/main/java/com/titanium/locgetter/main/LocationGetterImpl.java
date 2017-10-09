@@ -78,12 +78,14 @@ class LocationGetterImpl implements LocationGetter {
 
     private void initGoogleApiClient(GoogleApiClient googleApiClient) {
         if (!googleApiClient.isConnected()) {
+            logger.log(TAG, "Google api client is not connected");
+            logger.log(TAG, "Google api client connecting");
             ConnectionResult res = googleApiClient.blockingConnect();
             if (!res.isSuccess()) {
                 throw new RuntimeException(THROWABLE_KEY_LOCATION);
             }
+            logger.log(TAG, "Google api client connected");
         }
-        logger.log(TAG, "Google api client connected");
     }
 
     private Status getLocationSettingsStatus(GoogleApiClient googleApiClient) {

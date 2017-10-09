@@ -47,7 +47,7 @@ public abstract class BaseLocationActivity extends AppCompatActivity implements 
     /**
      * Parses throwable and gets appropriate message from it to show to user
      */
-    protected void onLocationError(Throwable throwable) {
+    public void onLocationError(Throwable throwable) {
         if (throwable instanceof NoGoogleApiException)
             showNoGoogleApiAvailable(((NoGoogleApiException) throwable).getErrorCode());
         else if (throwable instanceof LocationSettingsException)
