@@ -1,1 +1,1 @@
-include ':locgetter'
+include ':locgetter', ':locgetter-sample'
