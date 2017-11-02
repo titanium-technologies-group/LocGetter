@@ -1,6 +1,6 @@
 LocGetter
 =========
-[![GitHub license](https://img.shields.io/github/license/mashape/apistatus.svg)](https://github.com/blainepwnz/AndroidContacts/blob/master/LICENSE.txt)
+[![GitHub license](https://img.shields.io/github/license/mashape/apistatus.svg)](https://github.com/titanium-codes/LocGetter/blob/master/LICENSE)
 [_![Download](https://api.bintray.com/packages/titanium-codes/Android/locgetter/images/download.svg) ](https://bintray.com/titanium-codes/Android/locgetter/_latestVersion)
 
 Overview
@@ -14,31 +14,56 @@ Install
 
 **Step 1.** Add it in your root build.gradle at the end of repositories:
 ```
-	allprojects {
-		repositories {
-			...
-			jcenter()
-    	}
-	}
+allprojects {
+    repositories {
+        jcenter()
+    }
+}
 ```
 **Step 2.** Add the dependency
+
+##### For Android studio 3.0
+**Recommended**: This will use all libraries that you defined
 ```
-	dependencies {
-		compile 'codes.titanium:locgetter:1.0.2'
-	}
+dependencies {
+    implementation 'com.android.support:appcompat-v7:YOUR_SUPPORT_LIBRARY_VERSION'
+    implementation 'com.android.support:design:YOUR_SUPPORT_LIBRARY_VERSION'
+    implementation 'io.reactivex.rxjava2:rxandroid:YOUR_RX_ANDROID_VERSION'
+    implementation 'io.reactivex.rxjava2:rxjava:YOUR_RX_JAVA_2_VERSION'
+    implementation 'com.google.android.gms:play-services-location:YOUR_GOOGLE_PLAY_VERSION'
+    implementation ('codes.titanium:locgetter:1.0.3',{
+        transitive = false
+    })
+}
+
+```
+**Not recommended:** This will use all dependencies from library, may increase apk size, increase methods count and lead to compile errors
+```
+dependencies {
+    implementation 'codes.titanium:locgetter:1.0.3'
+}
 ```
 
-#### Maven
-
+#### For Android studio 2.3
+**Recommended**: This will use all libraries that you defined
 ```
-<dependency>
-  <groupId>codes.titanium</groupId>
-  <artifactId>locgetter</artifactId>
-  <version>1.0.2</version>
-  <type>pom</type>
-</dependency>
+dependencies {
+    compile 'com.android.support:appcompat-v7:YOUR_SUPPORT_LIBRARY_VERSION'
+    compile 'com.android.support:design:YOUR_SUPPORT_LIBRARY_VERSION'
+    compile 'io.reactivex.rxjava2:rxandroid:YOUR_RX_ANDROID_VERSION'
+    compile 'io.reactivex.rxjava2:rxjava:YOUR_RX_JAVA_2_VERSION'
+    compile 'com.google.android.gms:play-services-location:YOUR_GOOGLE_PLAY_VERSION'
+    compile ('codes.titanium:locgetter:1.0.3',{
+        transitive = false
+    })
+}
 ```
-
+**Not recommended:** This will use all dependencies from library, may increase apk size, increase methods count and lead to compile errors
+```
+dependencies {
+    compile 'codes.titanium:locgetter:1.0.3'
+}
+```
 
 Basic Usage
 -----------
@@ -85,6 +110,9 @@ You can extend your activity from **BaseLocationActivity** and get access to ext
 
 Release notes
 -------------
+### 1.0.3
+> * Updated Readme
+> * Updated dependencies bump
 
 ### 1.0.2
 > * Fixed bug with retrolambda crash of onLocationError
