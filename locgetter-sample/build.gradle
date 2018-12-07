@@ -38,7 +38,5 @@ dependencies {
     implementation 'io.reactivex.rxjava2:rxjava:2.1.5'
     implementation 'com.google.android.gms:play-services-location:11.4.2'
     testImplementation 'junit:junit:4.12'
-    implementation ('codes.titanium:locgetter:1.0.3',{
-        transitive = false
-    })
+    implementation project(':locgetter')
 }
