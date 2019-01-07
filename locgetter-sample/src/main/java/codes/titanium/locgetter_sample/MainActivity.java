@@ -1,6 +1,7 @@
 package codes.titanium.locgetter_sample;
 
 import android.os.Bundle;
+import android.support.v4.app.FragmentActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -8,14 +9,13 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.titanium.locgetter.infra.BaseLocationActivity;
 import com.titanium.locgetter.main.LocationGetter;
-import com.titanium.locgetter.main.LocationGetterBuilder;
+import com.titanium.locgetter.main.LocationProviderFactory;
 
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
 
-public class MainActivity extends BaseLocationActivity {
+public class MainActivity extends FragmentActivity {
 
     private static final String TAG = "MainActivity";
     private LocationGetter locationGetter;
@@ -35,17 +35,19 @@ public class MainActivity extends BaseLocationActivity {
         Button locationsBtn = findViewById(R.id.locations_btn);
         locationsBtn.setOnClickListener(v -> onLocationUpdatesClicked(locationsBtn));
         findViewById(R.id.latest_location_btn).setOnClickListener(v -> {
-            Toast.makeText(this, "Latest location = " + locationGetter.getLatestSavedLocation(), Toast.LENGTH_SHORT).show();
+            locationGetter.getLatestSavedLocationSingle()
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(location -> Toast.makeText(this, location.toString(), Toast.LENGTH_SHORT).show(),
+                            throwable -> Log.e(TAG, throwable.getMessage()));
         });
         findViewById(R.id.one_location_btn).setOnClickListener(v -> getOneLocation());
     }
 
     private void getOneLocation() {
         locationGetter.getLatestLocation()
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribe(location -> {
-                ((TextView) findViewById(R.id.locations_tv)).setText(location.toString());
-            }, this::onLocationError);
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(location -> ((TextView) findViewById(R.id.locations_tv)).setText(location.toString()),
+                        throwable -> Log.e(TAG, throwable.getMessage()));
     }
 
 
@@ -62,10 +64,8 @@ public class MainActivity extends BaseLocationActivity {
 
     private void startLocationUpdates() {
         locationsDisposable = locationGetter.getLatestLocations()
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribe(location -> adapter.addLocation(location)
-                , this::onLocationError,
-                () -> Log.d(TAG, "startLocationUpdates: completed"));
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(location -> adapter.addLocation(location), throwable -> Log.e(TAG, throwable.getMessage()));
     }
 
     private void initRv() {
@@ -76,19 +76,7 @@ public class MainActivity extends BaseLocationActivity {
     }
 
     private void initLocationGetter() {
-        locationGetter = new LocationGetterBuilder(getApplicationContext())
-            .setLogger(Log::d)
-            .build();
-    }
-
-    @Override
-    protected void onLocationPermissionResult(boolean granted) {
-        Toast.makeText(this, "Location permission granted = " + granted, Toast.LENGTH_SHORT).show();
-    }
-
-    @Override
-    protected void onLocationSettingsResult(boolean granted) {
-        Toast.makeText(this, "Location settings granted = " + granted, Toast.LENGTH_SHORT).show();
+        locationGetter = LocationProviderFactory.getInstance().getProvider(this);
     }
 
 }
