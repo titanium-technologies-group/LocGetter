@@ -1,0 +1,48 @@
+apply plugin: 'com.jfrog.bintray'
+apply from: '../deps.gradle'
+
+def mSiteUrl = 'https://github.com/titanium-codes'
+def mGitUrl = 'https://github.com/titanium-codes/LocGetter'
+
+tasks.withType(Javadoc) {
+    options.addStringOption('Xdoclint:none', '-quiet')
+    options.addStringOption('encoding', 'UTF-8')
+    options.addStringOption('charSet', 'UTF-8')
+}
+android {
+    compileSdkVersion versions.compileSdkVersion
+}
+ext {
+    bintrayRepo = 'Android'
+    bintrayName = versions.artifact
+
+    publishedGroupId = 'codes.titanium'
+    libraryName = versions.artifact
+    artifact = versions.artifact
+
+    libraryDescription = 'Android library for getting user current location'
+
+    // Your github repo link
+    siteUrl = mSiteUrl
+    gitUrl = mGitUrl
+    githubRepository = 'titanium-codes/LocGetter'
+
+    libraryVersion = versions.publishVersion
+
+    developerId = 'blainepwnz'
+    developerName = 'Andrew Tomash'
+    developerEmail = 'andrew.tomash@titanium-soft.com'
+    licenseName = 'MIT'
+    licenseUrl = 'https://opensource.org/licenses/MIT'
+    allLicenses = ["MIT"]
+}
+bintray {
+    pkg {
+        userOrg = "titanium-codes"
+    }
+}
+apply from: 'https://raw.githubusercontent.com/nisrulz/JCenter/master/installv1.gradle'
+apply from: 'https://raw.githubusercontent.com/nisrulz/JCenter/master/bintrayv1.gradle'
+apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-android-extensions'
+
