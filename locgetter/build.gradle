@@ -1,20 +1,17 @@
 apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
 apply plugin: 'com.jfrog.bintray'
-
-def buildName = "1.0.3"
-def buildCode = 4
-def mSiteUrl = 'https://github.com/titanium-codes'
-def mGitUrl = 'https://github.com/titanium-codes/LocGetter'
+apply from: '../deps.gradle'
+apply from: '../bintray.gradle'
 
 android {
-    compileSdkVersion 27
-    buildToolsVersion "26.0.2"
+    compileSdkVersion versions.compileSdkVersion
+    buildToolsVersion versions.buildToolsVersion
     defaultConfig {
-        minSdkVersion 15
-        targetSdkVersion 27
-        versionCode buildCode
-        versionName buildName
+        minSdkVersion versions.minSdk
+        targetSdkVersion versions.compileSdkVersion
+        versionCode versions.buildCode
+        versionName versions.publishVersion
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     compileOptions {
@@ -28,55 +25,10 @@ android {
         }
     }
 }
-// ./gradlew :locgetter:clean build install bintrayUpload to upload to bintray
+
 dependencies {
-    //Rx Android & Java libraries
-    compile "com.android.support:design:27.0.0"
-    compile 'io.reactivex.rxjava2:rxandroid:2.0.1'
-    compile 'io.reactivex.rxjava2:rxjava:2.1.5'
-    compile 'com.google.android.gms:play-services-location:16.0.0'
-    compile "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
-}
-
-tasks.whenTaskAdded { task ->
-    if (task.name == 'javadoc') {
-        task.configure {
-            failOnError false
-        }
-    }
-}
-
-ext {
-    bintrayRepo = 'Android'
-    bintrayName = 'locgetter'   // Has to be same as your library module name
-
-    publishedGroupId = 'codes.titanium'
-    libraryName = 'locgetter'
-    artifact = 'locgetter'     // Has to be same as your library module name
-
-    libraryDescription = 'Android library for getting user current location'
-
-    // Your github repo link
-    siteUrl = mSiteUrl
-    gitUrl = mGitUrl
-    githubRepository = 'titanium-codes/LocGetter'
-
-    libraryVersion = buildName
-
-    developerId = 'blainepwnz'
-    developerName = 'Andrew Tomash'
-    developerEmail = 'andrew.tomash@titanium-soft.com'
-    licenseName = 'MIT'
-    licenseUrl = 'https://opensource.org/licenses/MIT'
-    allLicenses = ["MIT"]
-}
-bintray {
-    pkg {
-        userOrg = "titanium-codes"
-    }
-}
-apply from: 'https://raw.githubusercontent.com/nisrulz/JCenter/master/installv1.gradle'
-apply from: 'https://raw.githubusercontent.com/nisrulz/JCenter/master/bintrayv1.gradle'
-repositories {
-    mavenCentral()
+    implementation versions.rxAndroid
+    implementation versions.rxJava2
+    implementation versions.playServLocations
+    implementation versions.kotlinStd
 }

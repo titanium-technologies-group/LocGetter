@@ -18,14 +18,8 @@ interface LocationGetter {
      */
     fun getLatestLocation() = getLatestLocations().firstOrError()
 
-    @Deprecated("")
     fun getLatestSavedLocation(): Location?
 
-    /**
-     * Gets latest saved location
-     */
-    fun getLatestSavedLocationSingle(): Single<Location>
-
-    fun getHotLocations(): Subject<Location>
+    val hotLocations: Subject<Location>
 
 }

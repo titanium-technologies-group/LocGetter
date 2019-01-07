@@ -1,6 +1,5 @@
 package com.titanium.locgetter.main
 
-@Deprecated("")
 interface Logger {
 
     /**
