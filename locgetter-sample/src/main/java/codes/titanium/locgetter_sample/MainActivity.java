@@ -11,7 +11,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.titanium.locgetter.main.LocationGetter;
-import com.titanium.locgetter.main.LocationProviderFactory;
+import com.titanium.locgetter.main.LocationGetterBuilder;
 
 import java.util.concurrent.TimeUnit;
 
@@ -83,7 +83,9 @@ public class MainActivity extends FragmentActivity {
     }
 
     private void initLocationGetter() {
-        locationGetter = LocationProviderFactory.getInstance().getProvider(this);
+        locationGetter = new LocationGetterBuilder(this)
+            .acceptMockLocations(false)
+            .build();
     }
 
 }
