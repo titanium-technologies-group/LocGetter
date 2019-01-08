@@ -3,8 +3,9 @@
     package="com.titanium.locgetter">
 
     <application>
-        <activity android:name=".main.ConnectableActivity"
-            android:theme="@android:style/Theme.Translucent.NoTitleBar"/>
+        <activity
+            android:name=".main.ConnectableActivity"
+            android:theme="@android:style/Theme.Translucent.NoTitleBar" />
     </application>
 
 </manifest>

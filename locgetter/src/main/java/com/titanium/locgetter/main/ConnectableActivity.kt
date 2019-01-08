@@ -10,7 +10,7 @@ import android.os.Message
 import android.os.Messenger
 import android.support.v4.app.FragmentActivity
 
-class ConnectableActivity : FragmentActivity() {
+internal class ConnectableActivity : FragmentActivity() {
 
     lateinit var messenger: Messenger
 
@@ -50,7 +50,7 @@ class ConnectableActivity : FragmentActivity() {
 
 }
 
-fun Context.launchConnectableActivity(onCreate: (Activity) -> Unit?,
+internal fun Context.launchConnectableActivity(onCreate: (Activity) -> Unit?,
                                       onActivityResult: (Int, Intent?) -> Unit = { _, _ -> },
                                       onRequestPermissionsResult: (Boolean) -> Unit = { },
                                       onDeAttach: () -> Unit = {}) {
@@ -66,7 +66,7 @@ val ON_REQUEST_PERMISSION_RESULT = 2
 val ON_DESTROY = 3
 val EXTRA_MESSENGER = "extra messenger"
 
-class ConnectableHandler(val onCreate: (Activity) -> Unit?,
+private class ConnectableHandler(val onCreate: (Activity) -> Unit?,
                          val onActivityResult: (Int, Intent?) -> Unit = { _, _ -> },
                          val onRequestPermissionsResult: (Boolean) -> Unit = { },
                          val onDeAttach: () -> Unit = {}) : Handler() {

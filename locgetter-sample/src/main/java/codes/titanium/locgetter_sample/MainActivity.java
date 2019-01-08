@@ -83,7 +83,7 @@ public class MainActivity extends FragmentActivity {
     }
 
     private void initLocationGetter() {
-        locationGetter = new LocationGetterBuilder(this)
+        locationGetter = new LocationGetterBuilder(getApplicationContext())
             .acceptMockLocations(false)
             .build();
     }
