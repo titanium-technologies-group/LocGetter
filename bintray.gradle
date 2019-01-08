@@ -9,6 +9,13 @@ tasks.withType(Javadoc) {
     options.addStringOption('encoding', 'UTF-8')
     options.addStringOption('charSet', 'UTF-8')
 }
+tasks.whenTaskAdded { task ->
+    if (task.name == 'javadoc') {
+        task.configure {
+            failOnError false
+        }
+    }
+}
 android {
     compileSdkVersion versions.compileSdkVersion
 }
