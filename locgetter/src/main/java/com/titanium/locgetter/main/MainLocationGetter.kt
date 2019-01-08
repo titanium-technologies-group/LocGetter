@@ -8,6 +8,7 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.location.Location
 import android.location.LocationManager
+import android.os.Build
 import android.provider.Settings
 import android.support.v4.content.ContextCompat
 import com.google.android.gms.location.LocationCallback
@@ -15,7 +16,8 @@ import com.google.android.gms.location.LocationRequest
 import com.google.android.gms.location.LocationResult
 import com.google.android.gms.location.LocationServices
 import com.titanium.locgetter.exception.LocationSettingsException
-import com.titanium.locgetter.exception.PermissionException
+import com.titanium.locgetter.exception.MockLocationException
+import com.titanium.locgetter.exception.NoLocationPermission
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.subjects.PublishSubject
@@ -23,7 +25,8 @@ import io.reactivex.subjects.Subject
 
 
 class MainLocationGetter constructor(private val appContext: Context,
-                                     private val logger: ((String, String) -> Unit)) : LocationGetter {
+                                     private val logger: ((String, String) -> Unit),
+                                     private val acceptMockLocations: Boolean) : LocationGetter {
 
     override val hotLocations: Subject<Location> = PublishSubject.create()
     private var latestLocation: Location? = null
@@ -75,18 +78,24 @@ class MainLocationGetter constructor(private val appContext: Context,
                     emitter.onNext("")
                     emitter.onComplete()
                 } else {
-                    emitter.onError(PermissionException(Manifest.permission.ACCESS_FINE_LOCATION))
+                    emitter.onError(NoLocationPermission())
                 }
             }
             appContext.launchConnectableActivity(permRequest, onRequestPermissionsResult = permResult, onDeAttach = onDeAttach)
         }
     }
 
-    internal fun isLocationPermitted() = ContextCompat.checkSelfPermission(appContext, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED
+    private fun isLocationPermitted() = ContextCompat.checkSelfPermission(appContext, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED
 
-    internal fun isLocationEnabled(): Boolean {
+    private fun isLocationEnabled() = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+        val lm = appContext.getSystemService(Context.LOCATION_SERVICE) as LocationManager
+        lm.isLocationEnabled
+    } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+        val mode = Settings.Secure.getInt(appContext.contentResolver, Settings.Secure.LOCATION_MODE, Settings.Secure.LOCATION_MODE_OFF)
+        mode != Settings.Secure.LOCATION_MODE_OFF
+    } else {
         val locationManager = appContext.getSystemService(Context.LOCATION_SERVICE) as LocationManager
-        return locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER) && locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)
+        locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER) && locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)
     }
 
     private inner class LocationSniffer {
@@ -97,6 +106,7 @@ class MainLocationGetter constructor(private val appContext: Context,
             }
         }
 
+        @SuppressLint("NewApi")
         fun startEmittingLocations(): Observable<Location> {
             //wrap callback with observable.create
             return Observable.create { e ->
@@ -105,10 +115,14 @@ class MainLocationGetter constructor(private val appContext: Context,
                     if (e.isDisposed)
                         unSubscribeFromUpdates()
                     else {
-                        logger(TAG, "Got new location :$location ,speed :${location.speed}")
-                        latestLocation = location
-                        hotLocations.onNext(location)
-                        e.onNext(location)
+                        if (location.isFromMockProvider && !acceptMockLocations) {
+                            e.onError(MockLocationException(location))
+                        } else {
+                            logger(TAG, "Got new location :$location ,speed :${location.speed}")
+                            latestLocation = location
+                            hotLocations.onNext(location)
+                            e.onNext(location)
+                        }
                     }
                 }
                 subscribeToUpdates()
