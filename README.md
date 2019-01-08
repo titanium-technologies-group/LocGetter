@@ -23,47 +23,24 @@ allprojects {
 **Step 2.** Add the dependency
 
 ##### For Android studio 3.0
-**Recommended**: This will use all libraries that you defined
+**Recommended**: This will use all libraries that you defined  
 ```
 dependencies {
-    implementation 'com.android.support:appcompat-v7:YOUR_SUPPORT_LIBRARY_VERSION'
-    implementation 'com.android.support:design:YOUR_SUPPORT_LIBRARY_VERSION'
     implementation 'io.reactivex.rxjava2:rxandroid:YOUR_RX_ANDROID_VERSION'
     implementation 'io.reactivex.rxjava2:rxjava:YOUR_RX_JAVA_2_VERSION'
     implementation 'com.google.android.gms:play-services-location:YOUR_GOOGLE_PLAY_VERSION'
-    implementation ('codes.titanium:locgetter:1.0.3',{
+    implementation ('codes.titanium:locgetter:1.1.0',{
         transitive = false
     })
 }
+```  
 
-```
 **Not recommended:** This will use all dependencies from library, may increase apk size, increase methods count and lead to compile errors
 ```
 dependencies {
-    implementation 'codes.titanium:locgetter:1.0.3'
+    implementation 'codes.titanium:locgetter:1.1.0'
 }
-```
-
-#### For Android studio 2.3
-**Recommended**: This will use all libraries that you defined
-```
-dependencies {
-    compile 'com.android.support:appcompat-v7:YOUR_SUPPORT_LIBRARY_VERSION'
-    compile 'com.android.support:design:YOUR_SUPPORT_LIBRARY_VERSION'
-    compile 'io.reactivex.rxjava2:rxandroid:YOUR_RX_ANDROID_VERSION'
-    compile 'io.reactivex.rxjava2:rxjava:YOUR_RX_JAVA_2_VERSION'
-    compile 'com.google.android.gms:play-services-location:YOUR_GOOGLE_PLAY_VERSION'
-    compile ('codes.titanium:locgetter:1.0.3',{
-        transitive = false
-    })
-}
-```
-**Not recommended:** This will use all dependencies from library, may increase apk size, increase methods count and lead to compile errors
-```
-dependencies {
-    compile 'codes.titanium:locgetter:1.0.3'
-}
-```
+```  
 
 Basic Usage
 -----------
@@ -83,9 +60,8 @@ All you need is to create **LocationGetter** instance using **LocationGetterBuil
 
 Optional you can add to builder:
 
-* LocationRequest to customize location updates
-* GoogleApiClient to use instance of your google api client
 * Logger to get logs of everything happening inside LocationGetter
+* Accept mock locations behavior
 
 Start getting locations using one of methods for e.g.
 
@@ -99,17 +75,30 @@ locationGetter.getLatestLocation()
 
 More examples can be found in sample package with sample app.
 
-Helper activity
+Error handling
 ---------------
-You can extend your activity from **BaseLocationActivity** and get access to extended behavior with some features.
+All exceptions are handled in library.
 
-1. Catch exceptions via onLocationError to handle settings and permissions errors
-2. Get callbacks with user locations permission granted/revoked and locations settings granted/revoke
-3. Show dialog on google api available
+In case of no permissions -> user will be asked to give permissions, if user declines -> NoLocationPermission will be thrown
 
+In case of turned off location -> user will be asked to turn it on, if user declines -> LocationSettingsException will be thrown
+
+Accept mock locations behavior 
+---
+By default mock locations are accepted.
+You can filter all mock locations that are received by location manager. Just set acceptMockLocations to false when you are building location getter.
+
+In case if mock location will be received MockLocationException will be thrown with that mocked location and you can decide what to do with it.
 
 Release notes
 -------------
+### 1.1.0
+> * Major refactor
+> * Removed a lot of redundant APIs
+> * No more need of activity to handle exceptions
+> * Optimizations
+> * Feature - mock locations filter 
+
 ### 1.0.3
 > * Updated Readme
 > * Updated dependencies bump

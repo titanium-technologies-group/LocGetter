@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -10,7 +9,7 @@
     <android.support.v7.widget.RecyclerView
         android:id="@+id/locations_rv"
         android:layout_width="match_parent"
-        android:layout_height="300dp"/>
+        android:layout_height="300dp" />
 
     <TextView
         android:id="@+id/locations_tv"
@@ -18,36 +17,34 @@
         android:layout_height="wrap_content"
         android:layout_below="@id/locations_rv"
         android:layout_centerHorizontal="true"
-        android:text="Latest location = "
-        />
+        android:text="Latest location = " />
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
-        android:orientation="horizontal"
-        >
+        android:orientation="horizontal">
 
         <Button
             android:id="@+id/locations_btn"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
-            android:text="Get locations"/>
+            android:text="Get locations" />
 
         <Button
             android:id="@+id/one_location_btn"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
-            android:text="Get one location"/>
+            android:text="Get one location" />
 
         <Button
             android:id="@+id/latest_location_btn"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
-            android:text="Get latest location"/>
+            android:text="Get latest location" />
 
     </LinearLayout>
 
