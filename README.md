@@ -92,6 +92,9 @@ In case if mock location will be received MockLocationException will be thrown w
 
 Release notes
 -------------
+### 1.1.2
+> * Extracted ConnectableActivity
+
 ### 1.1.1
 > * Updated documentation
 > * Fixed ConnectableActivity visibility

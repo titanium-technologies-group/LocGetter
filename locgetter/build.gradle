@@ -28,7 +28,10 @@ android {
 
 dependencies {
     implementation versions.rxAndroid
+    implementation versions.supportV7
+    implementation versions.supportV4
     implementation versions.rxJava2
     implementation versions.playServLocations
     implementation versions.kotlinStd
+    implementation versions.connectableActivity
 }

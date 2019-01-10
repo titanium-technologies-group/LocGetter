@@ -5,7 +5,6 @@ import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -72,7 +71,7 @@ public class MainActivity extends FragmentActivity {
     private void startLocationUpdates() {
         locationsDisposable = locationGetter.getLatestLocations()
             .observeOn(AndroidSchedulers.mainThread())
-            .subscribe(location -> adapter.addLocation(location), throwable -> Log.e(TAG, throwable.getMessage()));
+            .subscribe(location -> adapter.addLocation(location), Throwable::printStackTrace);
     }
 
     private void initRv() {
