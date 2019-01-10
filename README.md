@@ -29,7 +29,7 @@ dependencies {
     implementation 'io.reactivex.rxjava2:rxandroid:YOUR_RX_ANDROID_VERSION'
     implementation 'io.reactivex.rxjava2:rxjava:YOUR_RX_JAVA_2_VERSION'
     implementation 'com.google.android.gms:play-services-location:YOUR_GOOGLE_PLAY_VERSION'
-    implementation ('codes.titanium:locgetter:1.1.1',{
+    implementation ('codes.titanium:locgetter:1.1.2',{
         transitive = false
     })
 }
@@ -38,7 +38,7 @@ dependencies {
 **Not recommended:** This will use all dependencies from library, may increase apk size, increase methods count and lead to compile errors
 ```
 dependencies {
-    implementation 'codes.titanium:locgetter:1.1.1'
+    implementation 'codes.titanium:locgetter:1.1.2'
 }
 ```  
 
