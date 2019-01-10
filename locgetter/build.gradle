@@ -31,4 +31,5 @@ dependencies {
     implementation versions.rxJava2
     implementation versions.playServLocations
     implementation versions.kotlinStd
+    implementation versions.connectableActivity
 }

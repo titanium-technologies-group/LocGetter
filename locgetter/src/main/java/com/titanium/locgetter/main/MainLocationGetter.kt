@@ -11,6 +11,7 @@ import android.location.LocationManager
 import android.os.Build
 import android.provider.Settings
 import android.support.v4.content.ContextCompat
+import codes.titanium.connectableactivity.launchConnectableActivity
 import com.google.android.gms.location.LocationCallback
 import com.google.android.gms.location.LocationRequest
 import com.google.android.gms.location.LocationResult
@@ -23,10 +24,9 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.subjects.PublishSubject
 import io.reactivex.subjects.Subject
 
-
-class MainLocationGetter constructor(private val appContext: Context,
-                                     private val logger: ((String, String) -> Unit),
-                                     private val acceptMockLocations: Boolean) : LocationGetter {
+internal class MainLocationGetter constructor(private val appContext: Context,
+                                              private val logger: ((String, String) -> Unit),
+                                              private val acceptMockLocations: Boolean) : LocationGetter {
 
     override val hotLocations: Subject<Location> = PublishSubject.create()
     private var latestLocation: Location? = null
