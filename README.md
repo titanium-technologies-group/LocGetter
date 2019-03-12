@@ -21,24 +21,10 @@ allprojects {
 }
 ```
 **Step 2.** Add the dependency
-
-##### For Android studio 3.0
-**Recommended**: This will use all libraries that you defined  
-```
-dependencies {
-    implementation 'io.reactivex.rxjava2:rxandroid:YOUR_RX_ANDROID_VERSION'
-    implementation 'io.reactivex.rxjava2:rxjava:YOUR_RX_JAVA_2_VERSION'
-    implementation 'com.google.android.gms:play-services-location:YOUR_GOOGLE_PLAY_VERSION'
-    implementation ('codes.titanium:locgetter:1.1.2',{
-        transitive = false
-    })
-}
-```  
-
-**Not recommended:** This will use all dependencies from library, may increase apk size, increase methods count and lead to compile errors
 ```
 dependencies {
     implementation 'codes.titanium:locgetter:1.1.2'
+    implementation 'codes.titanium:connectableactivity:1.0.3'
 }
 ```  
 
