@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -45,13 +46,20 @@ public class MainActivity extends FragmentActivity {
                 Toast.makeText(this, "Null latest location", Toast.LENGTH_SHORT).show();
             }
         });
-        findViewById(R.id.one_location_btn).setOnClickListener(v -> getOneLocation());
+        findViewById(R.id.one_location_btn).setOnClickListener(v -> {
+            getOneLocation(0);
+            getOneLocation(500);
+            getOneLocation(1000);
+            getOneLocation(1500);
+            getOneLocation(2000);
+        });
     }
 
-    private void getOneLocation() {
-        Single.timer(2, TimeUnit.SECONDS)
+    private void getOneLocation(long delay) {
+        Single.timer(delay, TimeUnit.MILLISECONDS)
             .observeOn(AndroidSchedulers.mainThread())
             .flatMap(s -> locationGetter.getLatestLocation())
+            .doOnSuccess(location -> Log.d(TAG, "getOneLocation: " + location))
             .subscribe(location -> ((TextView) findViewById(R.id.locations_tv)).setText(location.toString()),
                 Throwable::printStackTrace);
     }
@@ -83,7 +91,6 @@ public class MainActivity extends FragmentActivity {
 
     private void initLocationGetter() {
         locationGetter = new LocationGetterBuilder(getApplicationContext())
-            .acceptMockLocations(false)
             .build();
     }
 
