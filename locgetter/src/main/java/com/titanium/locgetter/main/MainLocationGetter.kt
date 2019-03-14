@@ -12,14 +12,14 @@ import android.os.Build
 import android.provider.Settings
 import android.support.v4.content.ContextCompat
 import codes.titanium.connectableactivity.launchConnectableActivity
-import com.google.android.gms.location.LocationCallback
-import com.google.android.gms.location.LocationRequest
-import com.google.android.gms.location.LocationResult
-import com.google.android.gms.location.LocationServices
+import com.google.android.gms.common.api.ApiException
+import com.google.android.gms.common.api.ResolvableApiException
+import com.google.android.gms.location.*
 import com.titanium.locgetter.exception.LocationSettingsException
 import com.titanium.locgetter.exception.MockLocationException
 import com.titanium.locgetter.exception.NoLocationPermission
 import io.reactivex.Observable
+import io.reactivex.ObservableEmitter
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.subjects.PublishSubject
 import io.reactivex.subjects.Subject
@@ -32,8 +32,9 @@ internal class MainLocationGetter constructor(private val appContext: Context,
     private var latestLocation: Location? = null
     private val locationRequest: LocationRequest
     private var fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(appContext)
-    val locationShare: Observable<Location> = Observable.defer { LocationSniffer().startEmittingLocations() }
-            .share()
+    private val locationShare: Observable<Location> = LocationSniffer().startEmittingLocations().share()
+    private val settingsShare: Observable<Any> = getLocationSettingsStatus().share()
+    private val permissionsShare: Observable<Any> = checkPermissions().share()
 
     init {
         locationRequest = LocationRequest.create()
@@ -44,34 +45,62 @@ internal class MainLocationGetter constructor(private val appContext: Context,
 
     override fun getLatestSavedLocation() = latestLocation
 
-    override fun getLatestLocations() = (if (isLocationPermitted()) Observable.just("") else askPermissions())
-            .flatMap { checkSettings() }
-            .flatMap { locationShare }
+    override fun getLatestLocations() = permissionsShare
+        .flatMap { settingsShare }
+        .flatMap { locationShare }
 
-    private fun checkSettings() = if (isLocationEnabled())
-        Observable.just(1)
-    else
-        askSettings()
+    internal fun getLocationSettingsStatus() = Observable.create<Any> { subscriber ->
+        if (isLocationEnabled()) {
+            subscriber.onNext("")
+            subscriber.onComplete()
+        } else {
+            val builder = LocationSettingsRequest.Builder()
+                .setAlwaysShow(true)
+                .addLocationRequest(locationRequest)
+            val result = LocationServices.getSettingsClient(appContext).checkLocationSettings(builder.build())
+            result.addOnCompleteListener {
+                try {
+                    it.getResult(ApiException::class.java)
+                    subscriber.onNext("")
+                    subscriber.onComplete()
+                } catch (exception: ApiException) {
+                    when (exception.statusCode) {
+                        LocationSettingsStatusCodes.RESOLUTION_REQUIRED ->
+                            try {
+                                showSettings(subscriber, exception as ResolvableApiException)
+                            } catch (e: Throwable) {
+                                subscriber.onError(e)
+                            }
+                        LocationSettingsStatusCodes.SETTINGS_CHANGE_UNAVAILABLE ->
+                            subscriber.onError(exception)
+                    }
+                }
+            }
+        }
+    }
 
-    private fun askSettings() = Observable.create<Any> { emitter ->
-        val onError = { if (!emitter.isDisposed) emitter.onError(LocationSettingsException()) }
-        val askRequest: (Activity) -> Unit = { f -> f.startActivityForResult(Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS), 1) }
-        val askResult: (Int, Intent?) -> Unit = { _, _ ->
-            if (isLocationEnabled()) {
-                emitter.onNext("")
-                emitter.onComplete()
-            } else {
-                onError()
+    private fun showSettings(subscriber: ObservableEmitter<Any>, resolvableApiException: ResolvableApiException) {
+        val onError = { if (!subscriber.isDisposed) subscriber.onError(LocationSettingsException()) }
+        val askRequest: (Activity) -> Unit = { resolvableApiException.startResolutionForResult(it, 0) }
+        val askResult: (Int, Intent?) -> Unit = { resultCode, _ ->
+            when (resultCode) {
+                Activity.RESULT_OK -> {
+                    subscriber.onNext("")
+                    subscriber.onComplete()
+                }
+                else -> onError()
             }
         }
         appContext.launchConnectableActivity(askRequest, onActivityResult = askResult, onDeAttach = onError)
     }
 
-
     @SuppressLint("NewApi")
-    private fun askPermissions(): Observable<Any> {
-        return Observable.create<Any> { emitter ->
-            val permRequest: (Activity) -> Unit = { f -> f.requestPermissions(arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), 1) }
+    private fun checkPermissions() = Observable.create<Any> { emitter ->
+        if (isLocationPermitted()) {
+            emitter.onNext("")
+            emitter.onComplete()
+        } else {
+            val permRequest: (Activity) -> Unit = { f -> f.requestPermissions(arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), 0) }
             val onDeAttach: () -> Unit = { if (!emitter.isDisposed) emitter.onError(RuntimeException("timeout")) }
             val permResult: (Boolean) -> Unit = { isGranted ->
                 if (isGranted) {

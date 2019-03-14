@@ -36,5 +36,7 @@ dependencies {
     implementation versions.playServLocations
     implementation versions.kotlinStd
     testImplementation 'junit:junit:4.12'
-    implementation project(':locgetter')
+    implementation 'codes.titanium:locgetter:1.2.0'
+    implementation 'codes.titanium:connectableactivity:1.0.3'
+//    implementation project(':locgetter')
 }

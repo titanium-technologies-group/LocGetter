@@ -23,7 +23,7 @@ allprojects {
 **Step 2.** Add the dependency
 ```
 dependencies {
-    implementation 'codes.titanium:locgetter:1.1.2'
+    implementation 'codes.titanium:locgetter:1.2.0'
     implementation 'codes.titanium:connectableactivity:1.0.3'
 }
 ```  
@@ -78,6 +78,10 @@ In case if mock location will be received MockLocationException will be thrown w
 
 Release notes
 -------------
+### 1.2.0
+> * Fixed share observable
+> * Locations settings dialog is now using default google one
+
 ### 1.1.2
 > * Extracted ConnectableActivity
 
